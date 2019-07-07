@@ -10,7 +10,6 @@ Assets/Standard Assets/
 ExportedObj/
 .consulo/
 
-*.sln
 *.vcxproj
 *.vcxproj.filters
 

@@ -66,10 +66,10 @@ void PlayScene::Receive(char * _data)
 	}
 }
 
-bool PlayScene::Send()
-{
-	return false;
-}
+//bool PlayScene::Send()
+//{
+//	return false;
+//}
 
 // ‚ ‚½‚è”»’è
 bool PlayScene::HitChack(Utility::Vector2 _v1, Utility::Vector2 _v2)

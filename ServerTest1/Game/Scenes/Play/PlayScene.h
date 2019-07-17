@@ -23,7 +23,7 @@ public:
 	// 受信時に行う処理
 	void Receive(char* _data) override;
 	// 全プレイヤー情報を送信する。
-	bool Send() override;
+	//bool Send() override;
 
 	// 自分と他の人の弾
 	bool HitChack(Utility::Vector2 _v1, Utility::Vector2 _v2);

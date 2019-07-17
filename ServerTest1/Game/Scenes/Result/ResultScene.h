@@ -21,7 +21,7 @@ public:
 	// 受信時に行う処理
 	void Receive(char* _data) override;
 	// 全プレイヤー情報を送信する。
-	bool Send() override;
+	//bool Send() override;
 
 	// シーン毎のプレイヤーを追加する。
 	void PushPlayers(Data::Pakets::IPaketData _player) { m_playerList.push_back(_player); }

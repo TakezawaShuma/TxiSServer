@@ -56,7 +56,7 @@ bool Game::Login()
 
 
 /// <summary>
-/// ルームの更新処理
+/// ゲームの更新処理
 /// </summary>
 bool Game::Updata()
 {
@@ -118,7 +118,7 @@ void Game::AssignToRoom(SOCKET _soc)
 		m_roomList[0]->Start(m_server);
 		// ログを流す
 		std::cout << "ルーム0を作成" << std::endl;
-		std::cout << "ルーム0に " << _soc << " 入室" << std::endl;
+		std::cout << "ルーム0に " << _soc << " が入室" << std::endl;
 	}
 	// ルームがある
 	else

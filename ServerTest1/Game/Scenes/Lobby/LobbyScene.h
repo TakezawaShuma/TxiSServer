@@ -21,17 +21,19 @@ public:
 
 	// 受信時に行う処理
 	void Receive(char* _data) override;
-	// 全プレイヤー情報を送信する。
-	bool Send() override;
+	//// 全プレイヤー情報を送信する。
+	//bool Send() override;
 	
 	// ロビーにいる人数を返す。
 	int SendSize() { return m_playerList.size(); }
 
 
 	// シーン毎のプレイヤーを追加する。
-	void PushPlayers(Data::Pakets::IPaketData _player) { m_playerList.push_back(_player); }
+	void PushPlayers(Data::Pakets::IPaketData _player)
+	{
+		m_playerList.push_back(_player); m_sendList = ConvertListType(m_playerList);
+	}
 	
-
 	// 送る情報のリストを獲得する
 	std::list<Data::Pakets::IPaketData> GetSendList()
 	{
@@ -42,6 +44,10 @@ public:
 
 	// どのシーンに切り替えるのかを決めるパケットを取得する
 	Data::Pakets::SwitchingPakets GetSwichPakets() { return m_swich; }
+
+private:
+	// 派生クラスのリストを基底クラスのリストに代入させる
+	std::list<Data::Pakets::IPaketData> ConvertListType(std::list<Data::Pakets::LobbyData> _list);
 private:
 
 	// シーンにいるプレイヤー情報

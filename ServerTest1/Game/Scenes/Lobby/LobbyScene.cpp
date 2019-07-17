@@ -101,11 +101,26 @@ void LobbyScene::Receive(char * _data)
 	{
 		//リストの中にいないなら追加する。
 		m_playerList.push_back(lobbyData);
+		m_sendList.push_back(lobbyData);
 	}
 }
 
-bool LobbyScene::Send()
+std::list<Data::Pakets::IPaketData> LobbyScene::ConvertListType(std::list<Data::Pakets::LobbyData> _list)
 {
-	return false;
+	std::list<Data::Pakets::IPaketData> tmp;
+	for each(auto var in _list)
+	{
+		tmp.push_back(var);
+	}
+	return tmp;
 }
+
+///// <summary>
+///// 送信処理
+///// </summary>
+///// <returns></returns>
+//bool LobbyScene::Send()
+//{
+//	return false;
+//}
 

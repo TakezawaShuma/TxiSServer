@@ -27,7 +27,11 @@ void ResultScene::Receive(char * _data)
 {
 }
 
-//bool ResultScene::Send()
-//{
-//	return false;
-//}
+bool ResultScene::Send()
+{
+	return false;
+}
+
+void ResultScene::DeleteList()
+{
+}

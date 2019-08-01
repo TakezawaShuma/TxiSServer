@@ -20,19 +20,24 @@ public:
 
 	// 受信時に行う処理
 	virtual void Receive(char* _data) = 0;
-	// 送信する。
-	//virtual bool Send() = 0;
 
-	// シーン毎のプレイヤーを追加する。
-	virtual void PushPlayers(Data::Pakets::IPaketData _player) = 0;
-	
-	// 送る情報のリストを獲得する
-	virtual std::list<Data::Pakets::IPaketData> GetSendList() = 0;
+	virtual void Send() = 0;
 
-	// どのシーンに切り替えるのかを決めるパケットを取得する
-	virtual Data::Pakets::SwitchingPakets GetSwichPakets() = 0;
 
 protected:
 
+	// シーン毎のプレイヤーを追加する。
+	virtual void PushPlayers(Data::Pakets::IPaketData _player) = 0;
+
+	virtual void OffTheCutter(SOCKET _soc) = 0;
+
+	// シーン毎のプレイヤーを削除する。
+	virtual void DeleteList() = 0;
+	
+	// 送る情報のリストを獲得する
+	virtual Data::Pakets::IPaketData* GetSendList(int _i) = 0;
+
+	// どのシーンに切り替えるのかを決めるパケットを取得する
+	virtual Data::Pakets::SwitchingPakets GetSwichPakets() = 0;
 };
 

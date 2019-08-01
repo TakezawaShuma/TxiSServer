@@ -36,7 +36,7 @@ public:
 	// óM
 	RECV_CONNECTION Recv(SOCKET _soc, char* _data, int _dataSize, int* _recvSize);
 	// ‘—M
-	bool Send(SOCKET _soc, char*_data, int _dataSize);
+	bool Send(SOCKET _soc, const char& _data, int _dataSize);
 	// Ø’f
 	bool Close();
 private:

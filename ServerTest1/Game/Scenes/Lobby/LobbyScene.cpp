@@ -16,6 +16,7 @@ LobbyScene::~LobbyScene()
 void LobbyScene::Start(std::list<SOCKET> _players)
 {
 	m_swich = Data::Pakets::SwitchingPakets(Data::Scenes::LOBBY, Data::Scenes::PLAY);
+	m_callFlag = false;
 }
 
 /// <summary>
@@ -26,27 +27,39 @@ Data::Scenes::SCENETYPE LobbyScene::Update()
 {
 	// 変更点がある場合はm_sendListに追加して情報を更新する
 	// ない場合はそのまま情報を更新する
-	for (std::list<Data::Pakets::LobbyData>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); itr++)
+	for each(Data::Pakets::LobbyData var in m_dataBufferList)
 	{
-		for each(Data::Pakets::LobbyData var in m_dataBufferList)
+		for (std::list<Data::Pakets::LobbyData>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); itr++)
 		{
 			if (itr->socket != var.socket) { continue; }
-			else 
-			{
-				if (var.ready != itr->ready)
-				{
-					m_sendList.push_back(var);
-				}
-				*itr = var;
-			}
+			else { *itr = var; }
 		}
 	}
+	// クライアントから何かコールがあったら全てを更新する
+	if (m_callFlag)
+	{
+		for each (Data::Pakets::LobbyData var in m_playerList) 
+		{
+			m_sendList.push_back(var); 
+			if (var.scene.nextScene == Data::Scenes::SCENETYPE::BACK)
+			{
+				m_delList.push_back(var);
+			}
+		}
+		m_callFlag = false;
+	}
+	
 	// バッファを削除する
 	m_dataBufferList.clear();
 
+
+	// シーンを切り替えるかどうかのリターン用変数
 	Data::Scenes::SCENETYPE ret = Data::Scenes::SCENETYPE::NON;
 	
-	// 全員の準備が出来たら
+
+
+
+	// 全員の準備が出来たらシーン切り替え用のパケットを送る
 	for (std::list<Data::Pakets::LobbyData>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); itr++)
 	{
 		if (itr->ready) { ret = Data::Scenes::SCENETYPE::PLAY; }
@@ -83,6 +96,7 @@ void LobbyScene::End()
 /// <param name="_soc"></param>
 void LobbyScene::Receive(char * _data)
 {
+	// リストの中に送られてきた人がいるなら追加させるフラグ
 	bool uptflag = false;
 	Data::Pakets::LobbyData lobbyData;
 	memcpy(&lobbyData, _data, sizeof(Data::Pakets::LobbyData));
@@ -101,10 +115,15 @@ void LobbyScene::Receive(char * _data)
 	{
 		//リストの中にいないなら追加する。
 		m_playerList.push_back(lobbyData);
-		m_sendList.push_back(lobbyData);
 	}
+	m_callFlag = true;
 }
 
+/// <summary>
+/// パケットの型を変更する
+/// </summary>
+/// <param name="_list"></param>
+/// <returns></returns>
 std::list<Data::Pakets::IPaketData> LobbyScene::ConvertListType(std::list<Data::Pakets::LobbyData> _list)
 {
 	std::list<Data::Pakets::IPaketData> tmp;
@@ -115,12 +134,46 @@ std::list<Data::Pakets::IPaketData> LobbyScene::ConvertListType(std::list<Data::
 	return tmp;
 }
 
-///// <summary>
-///// 送信処理
-///// </summary>
-///// <returns></returns>
-//bool LobbyScene::Send()
-//{
-//	return false;
-//}
+/// <summary>
+/// 切断された人を削除リストに追加
+/// </summary>
+/// <param name="_soc"></param>
+void LobbyScene::OffTheCutter(SOCKET _soc)
+{
+	m_delList.push_back(Data::Pakets::LobbyData(_soc));
+}
+
+/// <summary>
+/// リストから削除
+/// </summary>
+void LobbyScene::DeleteList()
+{
+	for each (Data::Pakets::LobbyData var in m_delList)
+	{
+		for (std::list<Data::Pakets::LobbyData>::iterator itr = m_playerList.begin(); itr != m_playerList.end(); itr++)
+		{
+			if (var.socket == itr->socket)
+			{
+				itr = m_playerList.erase(itr);
+				std::cout << "ロビーから " << itr->socket << " が退出した。" << std::endl;
+				break;
+			}
+		}
+	}
+}
+
+/// <summary>
+/// 指定されたリストの中身を返す
+/// </summary>
+/// <param name="_i"></param>
+/// <returns></returns>
+Data::Pakets::IPaketData * LobbyScene::GetSendList(int _i)
+{
+	if (m_sendList.size() > _i)
+	{
+		return &m_sendList[_i];
+	}
+	m_sendList.clear();
+	return nullptr;
+}
 

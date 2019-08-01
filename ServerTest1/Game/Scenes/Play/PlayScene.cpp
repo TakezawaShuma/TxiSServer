@@ -66,10 +66,10 @@ void PlayScene::Receive(char * _data)
 	}
 }
 
-//bool PlayScene::Send()
-//{
-//	return false;
-//}
+bool PlayScene::Send()
+{
+	return false;
+}
 
 // ‚ ‚½‚è”»’è
 bool PlayScene::HitChack(Utility::Vector2 _v1, Utility::Vector2 _v2)
@@ -109,6 +109,10 @@ bool PlayScene::Execution(Data::Pakets::PlayData* _p1, Data::Pakets::PlayData* _
 	return flag;
 }
 
+void PlayScene::DeleteList()
+{
+}
+
 Data::Pakets::PlayData PlayScene::SetStartPosition(SOCKET _soc, Utility::Vector2 _vec)
 {
 	Data::Pakets::PlayData tmp = Data::Pakets::PlayData(_soc);
@@ -119,7 +123,7 @@ Data::Pakets::PlayData PlayScene::SetStartPosition(SOCKET _soc, Utility::Vector2
 Utility::Vector2 PlayScene::RandomPosition()
 {
 	Utility::Vector2 ret;
-	int buf = (rand() % 2000) - 1000;
+	float buf = (rand() % 2000) - 1000;
 	ret.x = buf;
 	buf = (rand() % 2000) - 1000;
 	ret.y = buf;

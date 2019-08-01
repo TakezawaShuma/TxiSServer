@@ -77,7 +77,7 @@ bool Game::Updata()
 			itr->second->Update();
 
 			// ‘—M
-			(itr)->second->SendRoomData();
+			(itr)->second->GetSendData();
 
 			// ƒ‹[ƒ€‚Ìíœ
 			if ((itr)->second->GetEntry() == Room::ENTRYSTATE::DELETE_ROOM)

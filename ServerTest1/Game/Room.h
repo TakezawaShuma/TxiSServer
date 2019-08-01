@@ -45,7 +45,10 @@ public:
 	bool ChangeRoomScene(Data::Scenes::SCENETYPE _nextScene);
 
 	// 情報の送信
-	bool SendRoomData();
+	bool SendRoomData(char* _data);
+
+	// シーンから送る情報を貰ってくる
+	void GetSendData();
 
 	// プレイヤーの削除
 	ENTRYSTATE DeletePlayers();

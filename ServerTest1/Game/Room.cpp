@@ -34,6 +34,7 @@ void Room::Start(ServerNet* _server)
 	m_server = _server;
 	// ロビーシーンを作成し開く
 	ChangeRoomScene(Data::Scenes::LOBBY);
+
 }
 
 /// <summary>
@@ -100,15 +101,15 @@ bool Room::ChangeRoomScene(Data::Scenes::SCENETYPE _nextScene)
 		ret = false;
 		break;
 	case Data::Scenes::PLAY:
-		m_scene.reset(new PlayScene());
-		m_roomScene.nowScene = Data::Scenes::SCENETYPE::PLAY;
-		m_roomScene.nextScene = Data::Scenes::SCENETYPE::NON;
+		//m_scene.reset(new PlayScene());
+		//m_roomScene.nowScene = Data::Scenes::SCENETYPE::PLAY;
+		//m_roomScene.nextScene = Data::Scenes::SCENETYPE::NON;
 		ret = false;
 		break;
 	case Data::Scenes::RESULT:
-		m_scene.reset(new ResultScene());
-		m_roomScene.nowScene = Data::Scenes::SCENETYPE::RESULT;
-		m_roomScene.nextScene = Data::Scenes::SCENETYPE::NON;
+		//m_scene.reset(new ResultScene());
+		//m_roomScene.nowScene = Data::Scenes::SCENETYPE::RESULT;
+		//m_roomScene.nextScene = Data::Scenes::SCENETYPE::NON;
 		ret = false;
 		break;
 	case Data::Scenes::BACK:
@@ -132,7 +133,7 @@ void Room::Receive()
 	for (std::list<SOCKET>::iterator itr = m_playerSocketList.begin(); itr != m_playerSocketList.end(); itr++)
 	{
 		int recvSize = 0;
-		char data[1024];
+		char data[1024] = { 0 };
 
 		//	受信する
 		RECV_CONNECTION state = m_server->Recv(*itr, data, sizeof(data), &recvSize);
@@ -176,6 +177,7 @@ void Room::Receive()
 		else if (state == RECV_CONNECTION::RECV_FAILURE)
 		{
 			m_delList.push_back(*itr);
+			m_scene->OffTheCutter(*itr);
 		}
 	}
 }
@@ -185,25 +187,50 @@ void Room::Receive()
 /// データを送る
 /// </summary>
 /// <returns>通信成功 true</returns>
-bool Room::SendRoomData()
+bool Room::SendRoomData(char* _data)
 {
-	// シーンから送る情報リストを貰ってくる
-	m_sendList = m_scene->GetSendList();
-	if (m_sendList.size() != 0)
+	for each (SOCKET var in m_playerSocketList)
 	{
-		char data[1024];
-
-		// 貰ったm_sendListの情報をクライアントに送っていく
-		for (std::list<Data::Pakets::IPaketData>::iterator itr = m_sendList.begin(); itr != m_sendList.end(); itr++)
-		{
-			memcpy(data, &*itr, sizeof(data));
-			// m_sendListの中身をルームの中にいる人に送る
-			for each (SOCKET var in m_playerSocketList) { m_server->Send(var, data, sizeof(data)); }
-		}
-		m_sendList.clear();
-		return true;
+		Data::Pakets::LobbyData l;
+		memcpy(&l, _data, sizeof(Data::Pakets::LobbyData));
+		m_server->Send(var, _data, sizeof(_data));
 	}
 	return false;
+}
+
+/// <summary>
+/// 
+/// </summary>
+void Room::GetSendData()
+{
+	// シーンから送る情報リストを貰ってくる
+	switch (m_roomScene.nowScene)
+	{
+	case Data::Scenes::SCENETYPE::LOBBY:
+	{
+		std::list<Data::Pakets::IPaketData*> sendList;
+		int i = 0;
+		while (true)
+		{
+			Data::Pakets::IPaketData*tmp = m_scene->GetSendList(i);
+			if (tmp == nullptr) { break; }
+			else
+			{
+				sendList.push_back(tmp);
+				i++;
+			}
+		}
+		for each (Data::Pakets::IPaketData* var in sendList)
+		{
+			char data[1024] = { 0 };
+			memcpy(data, var, sizeof(data));
+			SendRoomData(data);
+		}
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 /// <summary>
@@ -212,12 +239,14 @@ bool Room::SendRoomData()
 /// <returns></returns>
 Room::ENTRYSTATE Room::DeletePlayers()
 {
+	m_scene->DeleteList();
 	// ルームからの削除処理
 	if (m_delList.size() != 0)
 	{
 		for each (SOCKET var in m_delList)
 		{
 			m_playerSocketList.remove(var);
+			std::cout << var << " が退出しました。" << std::endl;
 			m_swithCount.remove(var);
 		}
 		m_delList.clear();

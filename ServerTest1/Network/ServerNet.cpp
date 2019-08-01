@@ -130,7 +130,7 @@ RECV_CONNECTION ServerNet::Recv(SOCKET _soc, char * _data, int _dataSize, int * 
 /// <param name="_sendData">送るデータ</param>
 /// <param name="_sendDataSize">送るデータサイズ</param>
 /// <returns>送信成否</returns>
-bool ServerNet::Send(SOCKET _sendSoc, char * _sendData, int _sendDataSize)
+bool ServerNet::Send(SOCKET _sendSoc,const char& _sendData, int _sendDataSize)
 {
 	int a = send(_sendSoc, _sendData, _sendDataSize, 0);
 
